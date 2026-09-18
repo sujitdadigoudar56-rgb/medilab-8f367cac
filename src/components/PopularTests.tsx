@@ -1,8 +1,19 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useApiData } from "@/hooks/useApiData";
+import { useAuth } from "@/hooks/useAuth";
+import { getBookingPath } from "@/lib/booking";
 
-const tests = [
+interface Test {
+  _id?: string;
+  name: string;
+  price: number;
+  report: string;
+}
+
+const fallbackTests: Test[] = [
   { name: "Complete Blood Count (CBC)", price: 299, report: "6 hrs" },
   { name: "Liver Function Test (LFT)", price: 449, report: "12 hrs" },
   { name: "Kidney Function Test (KFT)", price: 499, report: "12 hrs" },
@@ -18,6 +29,10 @@ const tests = [
 ];
 
 const PopularTests = () => {
+  const { data: tests } = useApiData<Test[]>("/data/tests", fallbackTests);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
     <section id="tests" className="py-24 md:py-32">
       <div className="container mx-auto px-4">
@@ -40,7 +55,7 @@ const PopularTests = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {tests.map((test, i) => (
             <motion.div
-              key={test.name}
+              key={test._id || test.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -54,7 +69,12 @@ const PopularTests = () => {
                   <span className="text-xs text-muted-foreground">Report: {test.report}</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="shrink-0 ml-3 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 ml-3 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                onClick={() => navigate(getBookingPath(user), { state: { type: "test", testId: test._id } })}
+              >
                 Book
               </Button>
             </motion.div>
@@ -62,7 +82,7 @@ const PopularTests = () => {
         </div>
 
         <div className="text-center mt-10">
-          <Button variant="hero" size="lg">
+          <Button variant="hero" size="lg" onClick={() => navigate(getBookingPath(user), { state: { type: "test" } })}>
             View All Tests <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>

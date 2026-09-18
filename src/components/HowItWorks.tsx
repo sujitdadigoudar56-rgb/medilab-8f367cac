@@ -1,34 +1,25 @@
 import { motion } from "framer-motion";
-import { Search, CalendarCheck, Droplets, FileCheck } from "lucide-react";
+import { useApiData } from "@/hooks/useApiData";
+import { getIcon } from "@/lib/iconMap";
 
-const steps = [
-  {
-    icon: Search,
-    step: "01",
-    title: "Choose Your Test",
-    description: "Browse our catalog of 500+ tests or upload a prescription to get started.",
-  },
-  {
-    icon: CalendarCheck,
-    step: "02",
-    title: "Book a Slot",
-    description: "Select a convenient time and date for home sample collection.",
-  },
-  {
-    icon: Droplets,
-    step: "03",
-    title: "Sample Collection",
-    description: "Our trained phlebotomist visits your home and collects samples safely.",
-  },
-  {
-    icon: FileCheck,
-    step: "04",
-    title: "Get Reports",
-    description: "Receive accurate digital reports within 24 hours on your phone.",
-  },
+interface ProcessStep {
+  _id?: string;
+  iconName: string;
+  stepNumber: string;
+  title: string;
+  description: string;
+}
+
+const fallbackSteps: ProcessStep[] = [
+  { iconName: "Search", stepNumber: "01", title: "Choose Your Test", description: "Browse our catalog of 500+ tests or upload a prescription to get started." },
+  { iconName: "CalendarCheck", stepNumber: "02", title: "Book a Slot", description: "Select a convenient time and date for home sample collection." },
+  { iconName: "Droplets", stepNumber: "03", title: "Sample Collection", description: "Our trained phlebotomist visits your home and collects samples safely." },
+  { iconName: "FileCheck", stepNumber: "04", title: "Get Reports", description: "Receive accurate digital reports within 24 hours on your phone." },
 ];
 
 const HowItWorks = () => {
+  const { data: steps } = useApiData<ProcessStep[]>("/data/process-steps", fallbackSteps);
+
   return (
     <section id="how-it-works" className="py-24 md:py-32">
       <div className="container mx-auto px-4">
@@ -49,9 +40,11 @@ const HowItWorks = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, i) => (
+          {steps.map((step, i) => {
+            const Icon = getIcon(step.iconName);
+            return (
             <motion.div
-              key={step.title}
+              key={step._id || step.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -64,9 +57,9 @@ const HowItWorks = () => {
               )}
 
               <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5 relative">
-                <step.icon className="w-8 h-8 text-primary" />
+                <Icon className="w-8 h-8 text-primary" />
                 <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center font-display">
-                  {step.step}
+                  {step.stepNumber}
                 </span>
               </div>
               <h3 className="text-lg font-display font-semibold mb-2 text-foreground">
@@ -76,7 +69,8 @@ const HowItWorks = () => {
                 {step.description}
               </p>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

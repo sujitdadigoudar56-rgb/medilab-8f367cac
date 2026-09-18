@@ -1,16 +1,13 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, type AppRole } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, Calendar, FileText, Settings, LogOut,
   Menu, X, Stethoscope, Heart, User, ChevronRight, Activity,
   ClipboardList, Building2, BarChart3, UserCog, Pill, BedDouble,
-  MessageSquare, Download
+  MessageSquare, Download, CreditCard
 } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
-
-type AppRole = Database["public"]["Enums"]["app_role"];
 
 interface NavItem {
   label: string;
@@ -25,6 +22,7 @@ const navByRole: Record<AppRole, NavItem[]> = {
     { label: "Nurses", href: "/admin/nurses", icon: <Heart className="h-5 w-5" /> },
     { label: "Patients", href: "/admin/patients", icon: <Users className="h-5 w-5" /> },
     { label: "Appointments", href: "/admin/appointments", icon: <Calendar className="h-5 w-5" /> },
+    { label: "Payments", href: "/admin/payments", icon: <CreditCard className="h-5 w-5" /> },
     { label: "Departments", href: "/admin/departments", icon: <Building2 className="h-5 w-5" /> },
     { label: "Reports", href: "/admin/reports", icon: <BarChart3 className="h-5 w-5" /> },
     { label: "User Management", href: "/admin/users", icon: <UserCog className="h-5 w-5" /> },

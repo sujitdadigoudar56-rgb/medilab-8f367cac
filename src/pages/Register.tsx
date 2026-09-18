@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth, type AppRole } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, UserPlus, Heart, Stethoscope, ShieldCheck, User } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
-
-type AppRole = Database["public"]["Enums"]["app_role"];
 
 const roles: { value: AppRole; label: string; icon: React.ReactNode; desc: string }[] = [
   { value: "patient", label: "Patient", icon: <User className="h-5 w-5" />, desc: "Book tests & appointments" },
@@ -27,6 +24,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { register } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,26 +38,14 @@ const Register = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: {
-          full_name: fullName.trim(),
-          role,
-        },
-      },
-    });
-    setLoading(false);
-
-    if (error) {
-      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account, then sign in.",
-      });
-      navigate("/login");
+    try {
+      await register({ fullName: fullName.trim(), email: email.trim(), password, role });
+      toast({ title: "Account created!", description: "Welcome to MediLab." });
+      navigate("/dashboard");
+    } catch (error) {
+      toast({ title: "Registration failed", description: (error as Error).message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 

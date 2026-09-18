@@ -1,14 +1,22 @@
 import { motion } from "framer-motion";
-import { Building2, Users, Award, Clock } from "lucide-react";
+import { useApiData } from "@/hooks/useApiData";
 
-const stats = [
-  { value: "50K+", label: "Happy Patients", icon: Users },
-  { value: "500+", label: "Lab Tests Available", icon: Award },
-  { value: "99.8%", label: "Report Accuracy", icon: Award },
-  { value: "24hrs", label: "Avg Report Time", icon: Clock },
+interface Stat {
+  _id?: string;
+  value: string;
+  label: string;
+}
+
+const fallbackStats: Stat[] = [
+  { value: "50K+", label: "Happy Patients" },
+  { value: "500+", label: "Lab Tests Available" },
+  { value: "99.8%", label: "Report Accuracy" },
+  { value: "24hrs", label: "Avg Report Time" },
 ];
 
 const About = () => {
+  const { data: stats } = useApiData<Stat[]>("/data/stats/about", fallbackStats);
+
   return (
     <section id="about" className="py-24 md:py-32">
       <div className="container mx-auto px-4">
@@ -51,7 +59,7 @@ const About = () => {
           >
             {stats.map((stat, i) => (
               <motion.div
-                key={stat.label}
+                key={stat._id || stat.label}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}

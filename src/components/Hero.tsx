@@ -2,6 +2,9 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock, ShieldCheck, Truck, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { getBookingPath } from "@/lib/booking";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const badges = [
@@ -12,6 +15,8 @@ const badges = [
 
 const Hero = () => {
   const [pincode, setPincode] = useState("");
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden pt-24">
@@ -81,7 +86,12 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 mb-10"
           >
-            <Button variant="hero" size="lg" className="text-base px-8 py-6">
+            <Button
+              variant="hero"
+              size="lg"
+              className="text-base px-8 py-6"
+              onClick={() => navigate(getBookingPath(user), { state: { type: "test" } })}
+            >
               Book a Lab Test
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>

@@ -3,6 +3,8 @@ import { Menu, X, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { getBookingPath } from "@/lib/booking";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -15,7 +17,10 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [lang, setLang] = useState<"en" | "kn">("en");
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const bookTest = () => navigate(getBookingPath(user), { state: { type: "test" } });
 
   return (
     <motion.nav
@@ -31,7 +36,17 @@ const Navbar = () => {
             <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Available in 50+ Cities</span>
             <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> 1-800-MEDILAB</span>
           </div>
-          <span>📱 Download Our App — Android & iOS</span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setLang(lang === "en" ? "kn" : "en")}
+              className="flex items-center gap-1 font-medium hover:opacity-80 transition-opacity"
+            >
+              <span className={lang === "en" ? "underline underline-offset-2" : "opacity-70"}>EN</span>
+              <span className="opacity-50">/</span>
+              <span className={lang === "kn" ? "underline underline-offset-2" : "opacity-70"}>ಕನ್ನಡ</span>
+            </button>
+            <span>📱 Download Our App — Android & iOS</span>
+          </div>
         </div>
       </div>
 
@@ -61,7 +76,7 @@ const Navbar = () => {
           <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
             Login
           </Button>
-          <Button variant="hero" size="sm" onClick={() => navigate("/register")}>
+          <Button variant="hero" size="sm" onClick={bookTest}>
             Book a Test
           </Button>
         </div>
@@ -94,7 +109,7 @@ const Navbar = () => {
             <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
               Login
             </Button>
-            <Button variant="hero" size="sm" onClick={() => navigate("/register")}>
+            <Button variant="hero" size="sm" onClick={bookTest}>
               Book a Test
             </Button>
           </div>
